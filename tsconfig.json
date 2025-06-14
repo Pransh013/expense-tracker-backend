@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Good modern JS target
+    "module": "CommonJS", // For Node.js (can use "NodeNext" for ESM later)
+    "rootDir": "src", // Your source folder
+    "outDir": "dist", // Compiled output
+    "strict": true, // Enable all strict type checks
+    "esModuleInterop": true, // Allow `import express from 'express'`
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true, // Faster builds, skip .d.ts checks
+    "moduleResolution": "node", // Resolve node_modules properly
+    "resolveJsonModule": true, // Allow importing `.json` files
+    "allowJs": false, // Disable JS files in src (optional)
+    "noEmitOnError": true, // Don’t emit files if there's an error
+    "noImplicitAny": true // Catch accidental `any` types
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
