@@ -1,14 +1,13 @@
 import { prisma } from "@/config/prisma";
+import {
+  CreateTransaction,
+  DeleteTransaction,
+  GetSummary,
+  GetTransactions,
+} from "@/types";
 
 export const transactionService = {
-  create: async (data: {
-    userId: string;
-    amount: number;
-    type: "EXPENSE" | "INCOME";
-    category: string;
-    description?: string;
-    date?: Date;
-  }) => {
+  create: async (data: CreateTransaction) => {
     return prisma.expense.create({
       data: {
         ...data,
@@ -17,7 +16,7 @@ export const transactionService = {
     });
   },
 
-  fetchAll: async (userId: string) => {
+  getAll: async ({ userId }: GetTransactions) => {
     return prisma.expense.findMany({
       where: {
         userId,
@@ -26,8 +25,29 @@ export const transactionService = {
     });
   },
 
-  delete: async (id: string) => {
+  delete: async ({ id }: DeleteTransaction) => {
     await prisma.expense.delete({ where: { id } });
     return true;
+  },
+
+  getSummary: async ({ userId }: GetSummary) => {
+    const income = await prisma.expense.aggregate({
+      where: { userId, type: "INCOME" },
+      _sum: { amount: true },
+    });
+
+    const expense = await prisma.expense.aggregate({
+      where: { userId, type: "EXPENSE" },
+      _sum: { amount: true },
+    });
+
+    const totalIncome = income._sum.amount ?? 0;
+    const totalExpense = expense._sum.amount ?? 0;
+
+    return {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+    };
   },
 };
