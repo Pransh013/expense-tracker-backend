@@ -8,6 +8,8 @@ const envSchema = z.object({
     .string()
     .url({ message: "Redis URL must be valid" }),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1, "Redis token is required"),
+  CLERK_PUBLISHABLE_KEY: z.string().min(1, "Clerk publishable key is required"),
+  CLERK_SECRET_KEY: z.string().min(1, "Clerk secret key is required"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

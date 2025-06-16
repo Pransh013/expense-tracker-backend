@@ -9,7 +9,9 @@ import {
 } from "@/types";
 
 export const transactionService = {
-  create: async (data: CreateTransaction): Promise<Expense> => {
+  create: async (
+    data: CreateTransaction & { userId: string }
+  ): Promise<Expense> => {
     try {
       return await prisma.expense.create({
         data: {

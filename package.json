@@ -25,6 +25,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@clerk/express": "^1.7.0",
     "@prisma/client": "^6.9.0",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.0",

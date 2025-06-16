@@ -1,15 +1,19 @@
-import {
-  createTransactionSchema,
-  deleteTransactionSchema,
-  getSummarySchema,
-  getTransactionsSchema,
-} from "@/schema";
+import { createTransactionSchema, deleteTransactionSchema } from "@/schema";
 import { transactionService } from "@/services/transaction.service";
 import { NextFunction, Request, Response } from "express";
 import { ErrorHandler } from "@/types";
+import { getAuth } from "@clerk/express";
 
 export const transactionController = {
   create: async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return next({
+        statusCode: 401,
+        message: "Unauthorized",
+      } as ErrorHandler);
+    }
+    
     const { success, data, error } = createTransactionSchema.safeParse(
       req.body
     );
@@ -23,7 +27,10 @@ export const transactionController = {
     }
 
     try {
-      const transaction = await transactionService.create(data);
+      const transaction = await transactionService.create({
+        ...data,
+        userId,
+      });
       res.status(201).json({ message: "Transaction created", transaction });
     } catch (err) {
       next(err);
@@ -31,17 +38,17 @@ export const transactionController = {
   },
 
   getAll: async (req: Request, res: Response, next: NextFunction) => {
-    const { success, data, error } = getTransactionsSchema.safeParse(req.query);
-    if (!success) {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
       return next({
-        statusCode: 400,
-        message: "Validation error",
-        errors: error.flatten().fieldErrors,
+        statusCode: 401,
+        message: "Unauthorized",
       } as ErrorHandler);
     }
 
     try {
-      const transactions = await transactionService.getAll(data);
+      const transactions = await transactionService.getAll({ userId });
       res.status(200).json({ transactions });
     } catch (err) {
       next(err);
@@ -70,17 +77,17 @@ export const transactionController = {
   },
 
   getSummary: async (req: Request, res: Response, next: NextFunction) => {
-    const { success, data, error } = getSummarySchema.safeParse(req.query);
-    if (!success) {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
       return next({
-        statusCode: 400,
-        message: "Validation error",
-        errors: error.flatten().fieldErrors,
+        statusCode: 401,
+        message: "Unauthorized",
       } as ErrorHandler);
     }
 
     try {
-      const summary = await transactionService.getSummary(data);
+      const summary = await transactionService.getSummary({ userId });
       res.status(200).json({ summary });
     } catch (err) {
       next(err);
