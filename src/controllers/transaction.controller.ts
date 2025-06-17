@@ -7,13 +7,14 @@ import { getAuth } from "@clerk/express";
 export const transactionController = {
   create: async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = getAuth(req);
+
     if (!userId) {
       return next({
         statusCode: 401,
         message: "Unauthorized",
       } as ErrorHandler);
     }
-    
+
     const { success, data, error } = createTransactionSchema.safeParse(
       req.body
     );
@@ -27,11 +28,11 @@ export const transactionController = {
     }
 
     try {
-      const transaction = await transactionService.create({
+      await transactionService.create({
         ...data,
         userId,
       });
-      res.status(201).json({ message: "Transaction created", transaction });
+      res.status(201).json({ message: "Transaction created" });
     } catch (err) {
       next(err);
     }

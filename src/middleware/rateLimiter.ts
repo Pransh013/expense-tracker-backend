@@ -1,9 +1,11 @@
 import ratelimit from "@/config/upstash";
+import { getAuth } from "@clerk/express";
 import { NextFunction, Request, Response } from "express";
 
 const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
-  const ip = req.ip || "anonymous";
-  const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+  const { userId } = getAuth(req);
+  const key = userId || req.ip || "anonymous";
+  const { success, limit, remaining, reset } = await ratelimit.limit(key);
 
   res.setHeader("X-RateLimit-Limit", limit);
   res.setHeader("X-RateLimit-Remaining", remaining);
